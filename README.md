@@ -13,8 +13,8 @@ I created an AI system that helps hospitals predict when they'll run out of crit
 ## 📽️ Live Demo & Screenshots
 
 ### 🌐 Try It Live
-**[Live Demo](https://rxforecaster-demo.herokuapp.com/dashboard)** ← Click to see it in action!  
-*Note: Demo runs on free hosting, so it might take 30 seconds to wake up*
+**[🚀 Live Demo](https://rx-forecaster-supply-chain.onrender.com/dashboard)** ← Click to see it in action!  
+*Note: Hosted on Render free tier, may take 30 seconds to wake up first time*
 
 ### 📸 Screenshots
 ![RxForecaster Dashboard](./screenshots/dashboard.png)
