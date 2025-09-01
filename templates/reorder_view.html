@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reorder Report - RxForecaster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2a5298;
+        }
+        
+        .summary-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .critical { color: #f44336; }
+        .high { color: #ff9800; }
+        .medium { color: #2196F3; }
+        .low { color: #4CAF50; }
+        
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .reorder-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .risk-critical {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .risk-high {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .risk-medium {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .risk-low {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2a5298;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Comprehensive Reorder Report</h1>
+            <p>AI-powered inventory recommendations for optimal stock management</p>
+        </div>
+        
+        <div class="content">
+            <div style="margin-bottom: 20px;">
+                <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+            
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Generating comprehensive reorder analysis...</p>
+                <p style="color: #666; margin-top: 10px;">This may take a moment as we analyze all drugs...</p>
+            </div>
+            
+            <div id="report-content" style="display: none;">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let reportData = null;
+        let filteredData = [];
+        
+        async function loadReorderReport() {
+            try {
+                const response = await fetch('/api/v1/reorder_report');
+                const data = await response.json();
+                
+                reportData = data;
+                filteredData = [...data.reorder_recommendations];
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('report-content').style.display = 'block';
+                
+                displayReport();
+                
+                // Add filter event listeners
+                document.getElementById('risk-filter').addEventListener('change', applyFilters);
+                document.getElementById('department-filter').addEventListener('change', applyFilters);
+                
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 
+                    `<div style="color: red; text-align: center;">
+                        <h3>❌ Error Loading Report</h3>
+                        <p>Unable to generate reorder report. Please try again.</p>
+                        <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+                    </div>`;
+            }
+        }
+        
+        function displayReport() {
+            const summary = reportData.summary;
+            
+            const content = `
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="summary-value">${summary.total_drugs_analyzed}</div>
+                        <div class="summary-label">Total Drugs Analyzed</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value critical">${summary.drugs_needing_reorder}</div>
+                        <div class="summary-label">Drugs Needing Reorder</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value">$${summary.total_estimated_cost.toLocaleString()}</div>
+                        <div class="summary-label">Total Estimated Cost</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value">${new Date(reportData.report_generated_at).toLocaleDateString()}</div>
+                        <div class="summary-label">Report Generated</div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                    <h3>🎯 Risk Distribution</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold;" class="critical">${summary.risk_distribution.CRITICAL}</div>
+                            <div style="color: #666;">Critical Risk</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold;" class="high">${summary.risk_distribution.HIGH}</div>
+                            <div style="color: #666;">High Risk</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold;" class="medium">${summary.risk_distribution.MEDIUM}</div>
+                            <div style="color: #666;">Medium Risk</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold;" class="low">${summary.risk_distribution.LOW}</div>
+                            <div style="color: #666;">Low Risk</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="risk-filter">Filter by Risk Level:</label>
+                        <select id="risk-filter">
+                            <option value="">All Risk Levels</option>
+                            <option value="CRITICAL">Critical</option>
+                            <option value="HIGH">High</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="LOW">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="department-filter">Filter by Department:</label>
+                        <select id="department-filter">
+                            <option value="">All Departments</option>
+                            ${Object.keys(summary.department_distribution).map(dept => 
+                                `<option value="${dept}">${dept}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div style="margin-left: auto;">
+                        <a href="/api/v1/reorder_report?format=csv" class="btn btn-success" target="_blank">
+                            📥 Download CSV Report
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="reorder-table">
+                    <table id="reorder-table">
+                        <thead>
+                            <tr>
+                                <th>Drug Name</th>
+                                <th>Department</th>
+                                <th>Current Stock</th>
+                                <th>Risk Level</th>
+                                <th>Days Until Stockout</th>
+                                <th>Recommended Order</th>
+                                <th>Order Cost</th>
+                                <th>Best Model</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('report-content').innerHTML = content;
+            displayTableRows();
+        }
+        
+        function applyFilters() {
+            const riskFilter = document.getElementById('risk-filter').value;
+            const departmentFilter = document.getElementById('department-filter').value;
+            
+            filteredData = reportData.reorder_recommendations.filter(item => {
+                const matchesRisk = !riskFilter || item.risk_level === riskFilter;
+                const matchesDepartment = !departmentFilter || item.department === departmentFilter;
+                return matchesRisk && matchesDepartment;
+            });
+            
+            displayTableRows();
+        }
+        
+        function displayTableRows() {
+            const tbody = document.getElementById('table-body');
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #666;">No items match the current filters.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredData.map(item => `
+                <tr>
+                    <td><strong>${item.drug_name}</strong></td>
+                    <td>${item.department}</td>
+                    <td>${item.current_stock} units</td>
+                    <td><span class="risk-badge risk-${item.risk_level.toLowerCase()}">${item.risk_level}</span></td>
+                    <td>${item.days_until_stockout || 'N/A'}</td>
+                    <td><strong>${item.recommended_order_qty} units</strong></td>
+                    <td>$${item.total_order_cost.toLocaleString()}</td>
+                    <td>${item.best_model}</td>
+                    <td>
+                        <a href="/forecast?drug=${encodeURIComponent(item.drug_name)}&periods=14" class="btn btn-primary" target="_blank">
+                            📊 Forecast
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load report when page loads
+        window.addEventListener('load', loadReorderReport);
+    </script>
+</body>
+</html>

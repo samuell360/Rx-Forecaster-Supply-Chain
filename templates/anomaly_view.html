@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anomaly Analysis - RxForecaster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .drug-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .risk-minimal { border-left-color: #4CAF50; }
+        .risk-low { border-left-color: #2196F3; }
+        .risk-medium { border-left-color: #ff9800; }
+        .risk-high { border-left-color: #f44336; }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .alert-success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .alert-warning {
+            background: #fff3e0;
+            color: #ef6c00;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .alert-danger {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2a5298;
+        }
+        
+        .metric-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .analysis-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .method-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #2a5298;
+        }
+        
+        .recommendations {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .recommendations ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .recommendations li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .recommendations li:last-child {
+            border-bottom: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2a5298;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Drug Anomaly Analysis</h1>
+            <p>AI-powered detection of unusual demand patterns and supply disruptions</p>
+        </div>
+        
+        <div class="content">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Analyzing demand patterns and detecting anomalies...</p>
+            </div>
+            
+            <div id="anomaly-content" style="display: none;">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Get drug name from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const drugName = urlParams.get('drug') || 'Morphine';
+        const daysBack = urlParams.get('days_back') || '180';
+        
+        // Fetch and display anomaly data
+        async function loadAnomalyAnalysis() {
+            try {
+                const response = await fetch(`/api/v1/anomalies/${drugName}?days_back=${daysBack}`);
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('anomaly-content').style.display = 'block';
+                
+                displayAnomalyAnalysis(data);
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 
+                    `<div class="alert alert-danger">
+                        <h3>Error Loading Analysis</h3>
+                        <p>Unable to load anomaly analysis for ${drugName}. Please try again.</p>
+                        <a href="/dashboard" class="btn">← Back to Dashboard</a>
+                    </div>`;
+            }
+        }
+        
+        function displayAnomalyAnalysis(data) {
+            const summary = data.summary;
+            
+            // Determine risk class and alert class
+            const getRiskClass = (level) => {
+                switch(level) {
+                    case 'HIGH': return 'risk-high';
+                    case 'MEDIUM': return 'risk-medium';
+                    case 'LOW': return 'risk-low';
+                    default: return 'risk-minimal';
+                }
+            };
+            
+            const getAlertClass = (level) => {
+                switch(level) {
+                    case 'HIGH': return 'alert-danger';
+                    case 'MEDIUM': return 'alert-warning';
+                    case 'LOW': return 'alert-info';
+                    default: return 'alert-success';
+                }
+            };
+            
+            const content = `
+                <div class="drug-info ${getRiskClass(summary.risk_level)}">
+                    <h2>🔍 ${data.drug_name} - Anomaly Analysis</h2>
+                    <p>Analysis Period: ${new Date(data.analysis_period.start_date).toLocaleDateString()} to ${new Date(data.analysis_period.end_date).toLocaleDateString()}</p>
+                    <p>Days Analyzed: <strong>${data.analysis_period.days_analyzed} days</strong></p>
+                </div>
+                
+                <div class="alert ${getAlertClass(summary.risk_level)}">
+                    <h3>🎯 Anomaly Risk Level: ${summary.risk_level}</h3>
+                    <p><strong>${summary.total_anomalies_detected} anomalies detected</strong> during the analysis period.</p>
+                    <p>Analysis Confidence: <strong>${summary.analysis_confidence}</strong></p>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">${summary.total_anomalies_detected}</div>
+                        <div class="metric-label">Total Anomalies</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${summary.risk_level}</div>
+                        <div class="metric-label">Risk Level</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${data.analysis_period.days_analyzed}</div>
+                        <div class="metric-label">Days Analyzed</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${summary.analysis_confidence}</div>
+                        <div class="metric-label">Confidence</div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <h3>🔬 Detection Methods Used</h3>
+                    ${getMethodsAnalysis(data.detailed_results)}
+                </div>
+                
+                ${summary.risk_factors.length > 0 ? `
+                <div class="analysis-section">
+                    <h3>⚠️ Risk Factors Identified</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        ${summary.risk_factors.map(factor => `
+                            <li style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                                🚨 ${factor}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                
+                ${summary.recommendations.length > 0 ? `
+                <div class="recommendations">
+                    <h3>💡 Recommendations</h3>
+                    <ul>
+                        ${summary.recommendations.map(rec => `
+                            <li>💡 ${rec}</li>
+                        `).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/dashboard" class="btn">← Back to Dashboard</a>
+                    <a href="/forecast?drug=${drugName}&periods=14" class="btn">📊 View Forecast</a>
+                    <a href="?drug=${drugName}&days_back=365" class="btn">📅 1-Year Analysis</a>
+                    <a href="/drugs" class="btn">🏥 All Drugs</a>
+                </div>
+            `;
+            
+            document.getElementById('anomaly-content').innerHTML = content;
+        }
+        
+        function getMethodsAnalysis(detailedResults) {
+            if (!detailedResults) {
+                return '<p>No detailed method results available.</p>';
+            }
+            
+            let html = '';
+            
+            Object.keys(detailedResults).forEach(method => {
+                const result = detailedResults[method];
+                const count = result.anomalies_count || 0;
+                
+                html += `
+                    <div class="method-card">
+                        <h4>${getMethodIcon(method)} ${method.replace('_', ' ').toUpperCase()}</h4>
+                        <p><strong>${count} anomalies detected</strong> using this method</p>
+                        <p style="color: #666; margin-top: 5px;">${getMethodDescription(method)}</p>
+                    </div>
+                `;
+            });
+            
+            return html || '<p>No detection methods were successfully applied.</p>';
+        }
+        
+        function getMethodIcon(method) {
+            switch(method) {
+                case 'z_score': return '📊';
+                case 'prophet': return '🔮';
+                case 'seasonal': return '📅';
+                case 'demand_spikes': return '📈';
+                default: return '🔍';
+            }
+        }
+        
+        function getMethodDescription(method) {
+            switch(method) {
+                case 'z_score':
+                    return 'Statistical analysis to detect outliers in demand patterns';
+                case 'prophet':
+                    return 'AI-powered detection using Facebook Prophet changepoints';
+                case 'seasonal':
+                    return 'Analysis of deviations from expected seasonal patterns';
+                case 'demand_spikes':
+                    return 'Detection of sudden spikes in demand that could indicate emergencies';
+                default:
+                    return 'Advanced anomaly detection method';
+            }
+        }
+        
+        // Load analysis when page loads
+        window.addEventListener('load', loadAnomalyAnalysis);
+    </script>
+</body>
+</html>
