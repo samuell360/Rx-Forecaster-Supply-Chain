@@ -3,24 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RxForecaster Dashboard</title>
+    <title>RxForecaster - Supply Chain Management Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #667eea; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
-        h1 { color: #333; text-align: center; }
-        .card { border: 1px solid #ddd; margin: 20px 0; padding: 20px; border-radius: 8px; }
-        .btn { background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #4CAF50;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card.success {
+            border-left-color: #4CAF50;
+        }
+        
+        .card.info {
+            border-left-color: #2196F3;
+        }
+        
+        .card.critical {
+            border-left-color: #f44336;
+        }
+        
+        .card.warning {
+            border-left-color: #ff9800;
+        }
+        
+        .card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            color: #555;
+            position: relative;
+            padding-left: 25px;
+            font-size: 0.95rem;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 8px 8px 0 0;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        
+        .btn.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+        
+        .btn.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .btn.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: #333;
+        }
+        
+        .footer {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .btn {
+                display: block;
+                text-align: center;
+                margin: 8px 0;
+            }
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Loading animation for status checks */
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1> RxForecaster Dashboard</h1>
-        <div class="card">
-            <h3>System Status</h3>
-            <p>Welcome to RxForecaster Supply Chain Management</p>
-            <a href="/api/v1/health" class="btn">API Health</a>
-            <a href="/drugs" class="btn">View Drugs</a>
+    <div class="header">
+        <h1>🏥 RxForecaster</h1>
+        <p>Advanced Supply Chain Management Dashboard</p>
+        <p><span class="status-indicator"></span>System Online - Ready for Operations</p>
+    </div>
+    
+    <div class="dashboard-grid">
+        <!-- System Overview Card -->
+        <div class="card success">
+            <h3>🎯 System Overview</h3>
+            <p>Your RxForecaster system is running successfully with all core features operational.</p>
+            <ul class="feature-list">
+                <li>30 Hospital Drugs Loaded</li>
+                <li>52 Weeks Historical Data</li>
+                <li>7 Departments Active</li>
+                <li>Real-time Forecasting Ready</li>
+            </ul>
+            <a href="/health" class="btn success" target="_blank">✅ Check System Health</a>
+        </div>
+        
+        <!-- Drug Inventory Card -->
+        <div class="card info">
+            <h3>📊 Drug Inventory</h3>
+            <p>View and manage your complete pharmaceutical inventory with risk assessments.</p>
+            <a href="/drugs" class="btn primary" target="_blank">🏥 View All Drugs</a>
+            <a href="/drugs?department=ICU" class="btn secondary" target="_blank">🚨 ICU Drugs</a>
+        </div>
+        
+        <!-- Critical Alerts Card -->
+        <div class="card critical">
+            <h3>🚨 Critical Alerts</h3>
+            <p>Monitor drugs at critical risk levels requiring immediate attention.</p>
+            <a href="/drugs?risk_level=CRITICAL" class="btn warning" target="_blank">⚠️ Critical Risk Drugs</a>
+            <a href="/drugs?risk_level=HIGH" class="btn secondary" target="_blank">🔶 High Risk Drugs</a>
+        </div>
+        
+        <!-- Demand Forecasting Card -->
+        <div class="card info">
+            <h3>🔮 Demand Forecasting</h3>
+            <p>Generate AI-powered demand forecasts using FB Prophet and ARIMA models.</p>
+            <a href="/forecast?drug=Morphine&periods=14" class="btn primary" target="_blank">💊 Morphine Forecast</a>
+            <a href="/forecast?drug=Paracetamol&periods=14" class="btn secondary" target="_blank">🔹 Paracetamol Forecast</a>
+            <a href="/forecast?drug=Insulin&periods=14" class="btn secondary" target="_blank">✅ Insulin Forecast</a>
+        </div>
+        
+        <!-- Anomaly Detection Card -->
+        <div class="card warning">
+            <h3>🔍 Anomaly Detection</h3>
+            <p>Detect unusual demand patterns and potential supply disruptions.</p>
+            <a href="/anomaly" class="btn warning" target="_blank">🔍 Analyze All Drugs</a>
+            <a href="/anomaly?drug=Morphine&days_back=90" class="btn secondary" target="_blank">📈 Advanced Analysis</a>
+        </div>
+        
+        <!-- Reorder Management Card -->
+        <div class="card success">
+            <h3>📋 Reorder Management</h3>
+            <p>Generate comprehensive reorder recommendations with cost analysis.</p>
+            <a href="/reorder" class="btn success" target="_blank">📊 Generate Report</a>
+            <a href="/reorder" class="btn warning" target="_blank">⚠️ Low Stock Alert</a>
         </div>
     </div>
+    
+    <div class="footer">
+        <p><strong>RxForecaster v1.0</strong> - Enterprise Supply Chain Management System</p>
+        <p>Built by pharmacists, for pharmacists. Powered by AI and advanced analytics.</p>
+    </div>
+    
+    <script>
+        // Auto-refresh status every 30 seconds
+        setInterval(function() {
+            fetch('/api/v1/health')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('System status:', data.status);
+                })
+                .catch(error => {
+                    console.log('System may be offline');
+                });
+        }, 30000);
+        
+        // Add click tracking
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                console.log('Accessing:', this.href);
+            });
+        });
+        
+        // Smooth animations on load
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.6s ease';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
 </body>
 </html>
