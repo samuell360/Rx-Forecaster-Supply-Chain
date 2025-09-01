@@ -1,0 +1,2 @@
+Dashboard reverted to original design
+Timestamp: 2025-09-01
