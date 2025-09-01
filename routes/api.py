@@ -97,7 +97,10 @@ def get_drug_forecast(drug_name):
     """Get forecast for a specific drug"""
     try:
         # Get optional parameters
-        periods = int(request.args.get('periods', 30))
+        periods = int(request.args.get('periods', 14))  # Reduced default for faster loading
+        
+        # Limit periods for performance on free hosting
+        periods = min(periods, 30)
         
         # Generate forecast
         forecast_result = forecasting_engine.compare_models_and_forecast(drug_name, periods)

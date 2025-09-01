@@ -40,7 +40,7 @@ class ForecastingEngine:
         self.models = {}
         self.model_performance = {}
     
-    def prepare_data(self, drug_name: str, days_back: int = 365) -> pd.DataFrame:
+    def prepare_data(self, drug_name: str, days_back: int = 180) -> pd.DataFrame:
         """Prepare time series data for forecasting"""
         # Get historical sales data
         with sqlite3.connect(self.db_path) as conn:

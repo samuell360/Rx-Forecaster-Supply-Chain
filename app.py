@@ -32,12 +32,12 @@ def create_app():
     app.register_blueprint(api, url_prefix='/api/v1')
     
     # Initialize database
-    print("🔄 Initializing RxForecaster database...")
+    print(" Initializing RxForecaster database...")
     try:
         db = initialize_database()
-        print("✅ Database initialized successfully")
+        print("Database initialized successfully")
     except Exception as e:
-        print(f"❌ Database initialization failed: {str(e)}")
+        print(f" Database initialization failed: {str(e)}")
     
     # Dashboard route
     @app.route('/dashboard')
@@ -74,6 +74,16 @@ def create_app():
     def anomaly_view():
         """Beautiful anomaly analysis page"""
         return render_template('anomaly_view.html')
+    
+    # Simple test route for deployment
+    @app.route('/test')
+    def test_route():
+        """Simple test endpoint"""
+        return jsonify({
+            'status': 'RxForecaster is working!',
+            'timestamp': datetime.now().isoformat(),
+            'message': 'All systems operational'
+        })
     
     # Root route
     @app.route('/')
@@ -201,11 +211,11 @@ if __name__ == '__main__':
     # Create and run the application
     app = create_app()
     
-    print("🚀 Starting RxForecaster Supply Chain Management System")
-    print("📊 Features: Forecasting, Anomaly Detection, Reorder Management")
-    print("🌐 API available at: http://localhost:5000")
-    print("📖 Documentation at: http://localhost:5000/docs")
-    print("🏥 Streamlit Dashboard: streamlit run dashboard.py")
+    print("Starting RxForecaster Supply Chain Management System")
+    print(" Features: Forecasting, Anomaly Detection, Reorder Management")
+    print(" API available at: http://localhost:5000")
+    print("Documentation at: http://localhost:5000/docs")
+    print("Streamlit Dashboard: streamlit run dashboard.py")
     print("=" * 60)
     
     # Run the Flask app
