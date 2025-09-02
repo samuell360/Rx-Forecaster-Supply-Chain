@@ -29,8 +29,12 @@ ENV/
 .env/
 
 # Database
+*.db
 *.db-journal
+*.sqlite3
 *.sqlite3-journal
+data/*.db
+data/*.sqlite*
 
 # IDE
 .vscode/
@@ -78,3 +82,31 @@ instance/
 # Backup files
 *.bak
 *.backup
+
+# Additional development files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Node modules (if any)
+node_modules/
+
+# secrets and config
+config.py
+secrets.json
+*.key
+
+# Large data files
+*.csv.backup
+data/large_*.csv
+
+# IDE specific
+.vscode/settings.json
+.idea/
+
+# Runtime
+*.pid
+*.seed
+*.coverage
+.nyc_output

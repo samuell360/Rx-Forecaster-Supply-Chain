@@ -14,9 +14,10 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0b1f4d 0%, #0a2a7a 100%);
+            background: #E8EAF6;
             min-height: 100vh;
             padding: 20px;
+            color: #212121;
         }
         
         .container {
@@ -24,12 +25,13 @@
             margin: 0 auto;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #E0E0E0;
             overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #0b1f4d 0%, #0a2a7a 100%);
+            background: #5C6BC0;
             color: white;
             padding: 30px;
             text-align: center;
@@ -40,17 +42,18 @@
         }
         
         .drug-info {
-            background: #f8f9fa;
+            background: #F3F4FA;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid #34A853;
+            border: 1px solid #E0E0E0;
         }
         
-        .risk-critical { border-left-color: #f44336; }
-        .risk-high { border-left-color: #ff9800; }
-        .risk-medium { border-left-color: #2196F3; }
-        .risk-low { border-left-color: #4CAF50; }
+        .risk-critical { border-left-color: #EA4335; }
+        .risk-high { border-left-color: #FBBC05; }
+        .risk-medium { border-left-color: #5C6BC0; }
+        .risk-low { border-left-color: #34A853; }
         
         .metrics-grid {
             display: grid;
@@ -63,18 +66,19 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #E0E0E0;
             text-align: center;
         }
         
         .metric-value {
             font-size: 2rem;
             font-weight: bold;
-            color: #2a5298;
+            color: #5C6BC0;
         }
         
         .metric-label {
-            color: #666;
+            color: #5F6368;
             margin-top: 5px;
         }
         
@@ -82,7 +86,8 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #E0E0E0;
             margin-bottom: 30px;
         }
         
@@ -90,23 +95,26 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #E0E0E0;
         }
         
         .btn {
             display: inline-block;
             padding: 12px 24px;
-            background: linear-gradient(135deg, #0b1f4d 0%, #0a2a7a 100%);
+            background: #1A9BD7;
             color: white;
             text-decoration: none;
             border-radius: 6px;
             font-weight: 500;
             margin: 10px;
+            border: none;
         }
         
         .btn:hover {
+            background: #0F7BB5;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
         .alert {
@@ -116,34 +124,39 @@
         }
         
         .alert-critical {
-            background: #ffebee;
-            color: #c62828;
-            border-left: 4px solid #f44336;
+            background: rgba(234, 67, 53, 0.1);
+            color: #EA4335;
+            border-left: 4px solid #EA4335;
+            border: 1px solid rgba(234, 67, 53, 0.2);
         }
         
         .alert-warning {
-            background: #fff3e0;
-            color: #ef6c00;
-            border-left: 4px solid #ff9800;
+            background: rgba(251, 188, 5, 0.1);
+            color: #FBBC05;
+            border-left: 4px solid #FBBC05;
+            border: 1px solid rgba(251, 188, 5, 0.2);
         }
         
         .alert-info {
-            background: #e3f2fd;
-            color: #1565c0;
-            border-left: 4px solid #2196F3;
+            background: rgba(92, 107, 192, 0.1);
+            color: #5C6BC0;
+            border-left: 4px solid #5C6BC0;
+            border: 1px solid rgba(92, 107, 192, 0.2);
         }
         
         .alert-success {
-            background: #e8f5e8;
-            color: #2e7d32;
-            border-left: 4px solid #4CAF50;
+            background: rgba(52, 168, 83, 0.1);
+            color: #34A853;
+            border-left: 4px solid #34A853;
+            border: 1px solid rgba(52, 168, 83, 0.2);
         }
         
         .recommendations {
-            background: #f8f9fa;
+            background: #F3F4FA;
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
+            border: 1px solid #E0E0E0;
         }
         
         .loading {
@@ -152,8 +165,8 @@
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2a5298;
+            border: 4px solid #E0E0E0;
+            border-top: 4px solid #5C6BC0;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -347,7 +360,7 @@
                 type: 'scatter',
                 mode: 'lines+markers',
                 name: 'Predicted Demand',
-                line: { color: '#2a5298', width: 3 },
+                line: { color: '#5C6BC0', width: 3 },
                 marker: { size: 6 }
             };
             
@@ -357,7 +370,7 @@
                 type: 'scatter',
                 mode: 'lines',
                 name: 'Upper Confidence',
-                line: { color: 'rgba(42, 82, 152, 0.3)', width: 1 },
+                line: { color: 'rgba(92, 107, 192, 0.3)', width: 1 },
                 showlegend: false
             };
             
@@ -367,9 +380,9 @@
                 type: 'scatter',
                 mode: 'lines',
                 name: 'Confidence Interval',
-                line: { color: 'rgba(42, 82, 152, 0.3)', width: 1 },
+                line: { color: 'rgba(92, 107, 192, 0.3)', width: 1 },
                 fill: 'tonexty',
-                fillcolor: 'rgba(42, 82, 152, 0.2)'
+                fillcolor: 'rgba(92, 107, 192, 0.2)'
             };
             
             const layout = {
@@ -392,7 +405,7 @@
                 y: accuracy,
                 type: 'bar',
                 marker: {
-                    color: ['#2a5298', '#667eea', '#764ba2'],
+                    color: ['#5C6BC0', '#34A853', '#FBBC05'],
                     opacity: 0.8
                 }
             };
