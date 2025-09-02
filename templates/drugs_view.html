@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0b1f4d 0%, #0a2a7a 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -28,7 +28,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #0b1f4d 0%, #0a2a7a 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -295,13 +295,29 @@
                 const response = await fetch('/api/v1/drugs');
                 const data = await response.json();
                 
-                allDrugs = data.drugs;
-                filteredDrugs = [...allDrugs];
+                // Support both legacy list and new structured response
+                if (Array.isArray(data)) {
+                    // Legacy: list of { drug_name }
+                    allDrugs = data.map(d => ({
+                        drug_name: d.drug_name || d.name || 'Unknown',
+                        department: '',
+                        current_stock: 0,
+                        weekly_sales: 0,
+                        weeks_remaining: 0,
+                        risk_level: 'LOW',
+                        unit_cost: 0
+                    }));
+                    filteredDrugs = [...allDrugs];
+                    populateDepartmentFilter([]);
+                } else {
+                    allDrugs = data.drugs || [];
+                    filteredDrugs = [...allDrugs];
+                    populateDepartmentFilter(data.departments || []);
+                }
                 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('inventory-content').style.display = 'block';
                 
-                populateDepartmentFilter(data.departments);
                 displaySummaryStats();
                 displayDrugs();
                 

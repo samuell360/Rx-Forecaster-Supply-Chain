@@ -1,2 +1,0 @@
-Trigger redeploy - Updated dashboard with new design
-Timestamp: 2025-09-01

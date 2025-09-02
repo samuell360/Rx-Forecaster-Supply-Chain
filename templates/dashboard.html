@@ -4,309 +4,298 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RxForecaster - Supply Chain Management Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 0;
-            overflow-x: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            width: 100%;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-            background: #4CAF50;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
-            }
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            padding: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-left: 5px solid #4CAF50;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-        
-        .card.success {
-            border-left-color: #4CAF50;
-        }
-        
-        .card.info {
-            border-left-color: #2196F3;
-        }
-        
-        .card.critical {
-            border-left-color: #f44336;
-        }
-        
-        .card.warning {
-            border-left-color: #ff9800;
-        }
-        
-        .card h3 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .card p {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-        
-        .feature-list {
-            list-style: none;
-            margin: 20px 0;
-        }
-        
-        .feature-list li {
-            padding: 8px 0;
-            color: #555;
-            position: relative;
-            padding-left: 25px;
-            font-size: 0.95rem;
-        }
-        
-        .feature-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin: 8px 8px 0 0;
-            font-size: 0.9rem;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-        
-        .btn.primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        }
-        
-        .btn.secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        }
-        
-        .btn.success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .btn.warning {
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-            color: #333;
-        }
-        
-        .footer {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            text-align: center;
-            color: white;
-            margin-top: 20px;
-        }
-        
-        .footer p {
-            margin: 5px 0;
-            opacity: 0.9;
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-                padding: 20px;
-                gap: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .card {
-                padding: 20px;
-            }
-            
-            .btn {
-                display: block;
-                text-align: center;
-                margin: 8px 0;
-            }
-        }
-        
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* Loading animation for status checks */
-        .loading {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #4CAF50;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/medical-theme.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
-    <div class="header">
-        <h1>🏥 RxForecaster</h1>
-        <p>Advanced Supply Chain Management Dashboard</p>
-        <p><span class="status-indicator"></span>System Online - Ready for Operations</p>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="header-icon">
+                    <i data-lucide="package"></i>
+                </div>
+                <div>
+                    <h1 class="header-title">RxForecaster</h1>
+                    <p class="header-subtitle">Advanced Supply Chain Management Dashboard</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="status-dot"></div>
+                <span>System Online - Ready for Operations</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Control Panel -->
+    <div class="container">
+        <div class="control-panel">
+            <div class="control-grid">
+                <div class="control-item">
+                    <label class="control-label">Time Range: <span id="time-range-value">30</span> days</label>
+                    <input type="range" id="time-range" class="slider" min="7" max="365" value="30">
+                </div>
+                <div class="control-item">
+                    <label class="control-label">Forecast Horizon: <span id="forecast-horizon-value">12</span> weeks</label>
+                    <input type="range" id="forecast-horizon" class="slider" min="1" max="52" value="12">
+                </div>
+                <div class="control-item">
+                    <label class="control-label">Alert Sensitivity: <span id="alert-sensitivity-value">50</span>%</label>
+                    <input type="range" id="alert-sensitivity" class="slider" min="0" max="100" value="50">
+                </div>
+                <div class="control-item">
+                    <label class="control-label">Drug Filter</label>
+                    <select id="drug-filter" class="select">
+                        <option value="all">All Drugs</option>
+                        <option value="morphine">Morphine</option>
+                        <option value="paracetamol">Paracetamol</option>
+                        <option value="insulin">Insulin</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label class="control-label">Drug Search</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input 
+                            type="text" 
+                            id="drug-search" 
+                            placeholder="Enter drug name..." 
+                            class="input"
+                            style="flex: 1; margin: 0;"
+                        />
+                        <button id="search-drug-btn" class="btn btn-blue" style="padding: 0.5rem 1rem; margin: 0;">
+                            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="container">
+        <div class="dashboard-grid">
+            
+            <!-- System Overview -->
+            <div class="dashboard-card card-green">
+                <div class="card-header">
+                    <h2 class="card-title">System Overview</h2>
+                    <i data-lucide="activity" class="card-icon" style="color: var(--green-600);"></i>
+                </div>
+                <p class="card-text">Your RxForecaster system is running successfully with all core features operational.</p>
+                
+                <ul class="card-features">
+                    <li><span class="feature-dot"></span><span id="count-drugs">30</span> Hospital Drugs Loaded</li>
+                    <li><span class="feature-dot"></span><span id="count-weeks">52</span> Weeks Historical Data</li>
+                    <li><span class="feature-dot"></span><span id="count-depts">7</span> Departments Active</li>
+                    <li><span class="feature-dot"></span>Real-time Forecasting Ready</li>
+                </ul>
+                
+                <button class="btn btn-green">Check System Health</button>
+            </div>
+
+            <!-- Drug Inventory -->
+            <div class="dashboard-card card-blue">
+                <div class="card-header">
+                    <h2 class="card-title">Drug Inventory</h2>
+                    <i data-lucide="package" class="card-icon" style="color: var(--blue-600);"></i>
+                </div>
+                <p class="card-text">View and manage your complete pharmaceutical inventory with risk assessments.</p>
+                
+                <div id="inventory-list" style="max-height: 12rem; overflow-y: auto; margin-bottom: 1rem;">
+                    <!-- Inventory items will be populated by JS -->
+                </div>
+                
+                <div>
+                    <button class="btn btn-blue">View All Drugs</button>
+                    <button class="btn btn-red">ICU Drugs</button>
+                </div>
+            </div>
+
+            <!-- Critical Alerts -->
+            <div class="dashboard-card card-red">
+                <div class="card-header">
+                    <h2 class="card-title">Critical Alerts</h2>
+                    <i data-lucide="alert-triangle" class="card-icon" style="color: var(--red-600);"></i>
+                </div>
+                <p class="card-text">Monitor drugs at critical risk levels requiring immediate attention.</p>
+                
+                <div class="grid-2">
+                    <div class="alert-box">
+                        <div class="alert-number" id="critical-count">3</div>
+                        <div class="alert-text">Critical Risk Drugs</div>
+                    </div>
+                    <div class="alert-box warning">
+                        <div class="alert-number" id="high-count">7</div>
+                        <div class="alert-text">High Risk Drugs</div>
+                    </div>
+                </div>
+                
+                <div id="risk-chart" class="chart-container-xl" style="height: 500px;"></div>
+            </div>
+
+            <!-- Demand Forecasting -->
+            <div class="dashboard-card card-purple col-span-2">
+                <div class="card-header">
+                    <h2 class="card-title">Demand Forecasting</h2>
+                    <i data-lucide="trending-up" class="card-icon" style="color: var(--purple-600);"></i>
+                </div>
+                <p class="card-text">Generate AI-powered demand forecasts using FB Prophet and ARIMA models.</p>
+                
+                <div id="forecast-chart" class="chart-container-xl" style="height: 400px;"></div>
+                
+                <div>
+                    <button class="btn btn-blue">Morphine Forecast</button>
+                    <button class="btn btn-purple">Paracetamol Forecast</button>
+                    <button class="btn btn-green">Insulin Forecast</button>
+                </div>
+            </div>
+
+            <!-- Anomaly Detection -->
+            <div class="dashboard-card card-yellow">
+                <div class="card-header">
+                    <h2 class="card-title">Anomaly Detection</h2>
+                    <i data-lucide="search" class="card-icon" style="color: var(--yellow-600);"></i>
+                </div>
+                <p class="card-text">Detect unusual demand patterns and potential supply disruptions.</p>
+                
+                <div id="anomaly-chart" class="chart-container-xl" style="height: 450px; margin-bottom: 1rem;">
+                    <!-- Anomaly detection chart will be populated by JS -->
+                </div>
+                
+                <div id="anomaly-list" style="margin-bottom: 1rem; max-height: 120px; overflow-y: auto;">
+                    <!-- Anomaly items will be populated by JS -->
+                </div>
+                
+                <div>
+                    <button class="btn btn-yellow">Analyze All Drugs</button>
+                    <button class="btn btn-blue">Advanced Analysis</button>
+                </div>
+            </div>
+
+            <!-- Reorder Management -->
+            <div class="dashboard-card card-indigo col-span-2">
+                <div class="card-header">
+                    <h2 class="card-title">Reorder Management</h2>
+                    <i data-lucide="refresh-cw" class="card-icon" style="color: var(--indigo-600);"></i>
+                </div>
+                <p class="card-text">Generate comprehensive reorder recommendations with cost analysis.</p>
+                
+                <div class="grid-2">
+                    <div>
+                        <h4 class="chart-title">Department Usage</h4>
+                        <div id="dept-chart" class="chart-container-large" style="height: 250px;"></div>
+                    </div>
+                    <div>
+                        <h4 class="chart-title">Budget Analysis</h4>
+                        <div id="budget-chart" class="chart-container-large" style="height: 250px;"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <button class="btn btn-indigo">Generate Report</button>
+                    <button class="btn btn-gray">
+                        <i data-lucide="download" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
+                        Download CSV
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <div class="dashboard-grid">
-        <!-- System Overview Card -->
-        <div class="card success">
-            <h3>🎯 System Overview</h3>
-            <p>Your RxForecaster system is running successfully with all core features operational.</p>
-            <ul class="feature-list">
-                <li>30 Hospital Drugs Loaded</li>
-                <li>52 Weeks Historical Data</li>
-                <li>7 Departments Active</li>
-                <li>Real-time Forecasting Ready</li>
-            </ul>
-            <a href="/health" class="btn success" target="_blank">✅ Check System Health</a>
+    <!-- Separate Business Analysis Section -->
+    <div class="container" style="margin-top: 3rem;">
+        <div class="section-header">
+            <h2 class="section-title">📊 Business Intelligence & Analytics</h2>
+            <p class="section-subtitle">Comprehensive financial and operational insights for strategic decision making</p>
         </div>
         
-        <!-- Drug Inventory Card -->
-        <div class="card info">
-            <h3>📊 Drug Inventory</h3>
-            <p>View and manage your complete pharmaceutical inventory with risk assessments.</p>
-            <a href="/drugs" class="btn primary" target="_blank">🏥 View All Drugs</a>
-            <a href="/drugs?department=ICU" class="btn secondary" target="_blank">🚨 ICU Drugs</a>
+        <div class="business-grid">
+            <!-- Enhanced Department Analytics -->
+            <div class="dashboard-card card-indigo mega-card">
+                <div class="card-header">
+                    <h2 class="card-title">Department Performance Analytics</h2>
+                    <i data-lucide="bar-chart-3" class="card-icon" style="color: var(--indigo-600);"></i>
+                </div>
+                <p class="card-text">Detailed analysis of drug usage patterns, efficiency metrics, and departmental comparisons.</p>
+                
+                <div id="dept-performance-chart" class="chart-container-xl" style="height: 450px; margin-bottom: 1rem;"></div>
+                
+                <div class="analytics-controls">
+                    <button class="btn btn-indigo">Department Report</button>
+                    <button class="btn btn-blue">Usage Trends</button>
+                    <button class="btn btn-green">Efficiency Metrics</button>
+                </div>
         </div>
         
-        <!-- Critical Alerts Card -->
-        <div class="card critical">
-            <h3>🚨 Critical Alerts</h3>
-            <p>Monitor drugs at critical risk levels requiring immediate attention.</p>
-            <a href="/drugs?risk_level=CRITICAL" class="btn warning" target="_blank">⚠️ Critical Risk Drugs</a>
-            <a href="/drugs?risk_level=HIGH" class="btn secondary" target="_blank">🔶 High Risk Drugs</a>
+            <!-- Enhanced Financial Analysis -->
+            <div class="dashboard-card card-cyan mega-card">
+                <div class="card-header">
+                    <h2 class="card-title">Financial Budget Analysis</h2>
+                    <i data-lucide="dollar-sign" class="card-icon" style="color: var(--cyan-600);"></i>
+        </div>
+                <p class="card-text">Comprehensive budget tracking, variance analysis, and cost optimization insights.</p>
+                
+                <div id="budget-performance-chart" class="chart-container-xl" style="height: 450px; margin-bottom: 1rem;"></div>
+                
+                <div class="analytics-controls">
+                    <button class="btn btn-cyan">Budget Report</button>
+                    <button class="btn btn-indigo">Cost Analysis</button>
+                    <button class="btn btn-gray">
+                        <i data-lucide="download" style="width: 1rem; height: 1rem; margin-right: 0.5rem;"></i>
+                        Export Financial Data
+                    </button>
+                </div>
         </div>
         
-        <!-- Demand Forecasting Card -->
-        <div class="card info">
-            <h3>🔮 Demand Forecasting</h3>
-            <p>Generate AI-powered demand forecasts using FB Prophet and ARIMA models.</p>
-            <a href="/forecast?drug=Morphine&periods=14" class="btn primary" target="_blank">💊 Morphine Forecast</a>
-            <a href="/forecast?drug=Paracetamol&periods=14" class="btn secondary" target="_blank">🔹 Paracetamol Forecast</a>
-            <a href="/forecast?drug=Insulin&periods=14" class="btn secondary" target="_blank">✅ Insulin Forecast</a>
+            <!-- Supply Chain Optimization -->
+            <div class="dashboard-card card-teal mega-card">
+                <div class="card-header">
+                    <h2 class="card-title">Supply Chain Optimization</h2>
+                    <i data-lucide="truck" class="card-icon" style="color: var(--teal-600);"></i>
         </div>
-        
-        <!-- Anomaly Detection Card -->
-        <div class="card warning">
-            <h3>🔍 Anomaly Detection</h3>
-            <p>Detect unusual demand patterns and potential supply disruptions.</p>
-            <a href="/anomaly" class="btn warning" target="_blank">🔍 Analyze All Drugs</a>
-            <a href="/anomaly?drug=Morphine&days_back=90" class="btn secondary" target="_blank">📈 Advanced Analysis</a>
-        </div>
-        
-        <!-- Reorder Management Card -->
-        <div class="card success">
-            <h3>📋 Reorder Management</h3>
-            <p>Generate comprehensive reorder recommendations with cost analysis.</p>
-            <a href="/reorder" class="btn success" target="_blank">📊 Generate Report</a>
-            <a href="/reorder" class="btn warning" target="_blank">⚠️ Low Stock Alert</a>
+                <p class="card-text">Advanced analytics for supplier performance, lead times, and inventory optimization.</p>
+                
+                <div id="supply-chain-chart" class="chart-container-xl" style="height: 450px; margin-bottom: 1rem;"></div>
+                
+                <div class="analytics-controls">
+                    <button class="btn btn-teal">Supplier Analysis</button>
+                    <button class="btn btn-blue">Lead Time Optimization</button>
+                    <button class="btn btn-green">Inventory Optimization</button>
+                </div>
+            </div>
         </div>
     </div>
     
-    <div class="footer">
-        <p><strong>RxForecaster v1.0</strong> - Enterprise Supply Chain Management System</p>
-        <p>Built by pharmacists, for pharmacists. Powered by AI and advanced analytics.</p>
-    </div>
-    
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <script src="/static/js/dashboard.js"></script>
     <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Slider value updates
+        function updateSliderValues() {
+            document.getElementById('time-range-value').textContent = document.getElementById('time-range').value;
+            document.getElementById('forecast-horizon-value').textContent = document.getElementById('forecast-horizon').value;
+            document.getElementById('alert-sensitivity-value').textContent = document.getElementById('alert-sensitivity').value;
+        }
+
+        // Add event listeners to sliders
+        document.addEventListener('DOMContentLoaded', function() {
+            const sliders = ['time-range', 'forecast-horizon', 'alert-sensitivity'];
+            sliders.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    slider.addEventListener('input', updateSliderValues);
+                }
+            });
+            updateSliderValues();
+        });
+
         // Auto-refresh status every 30 seconds
         setInterval(function() {
             fetch('/api/v1/health')
@@ -318,28 +307,6 @@
                     console.log('System may be offline');
                 });
         }, 30000);
-        
-        // Add click tracking
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                console.log('Accessing:', this.href);
-            });
-        });
-        
-        // Smooth animations on load
-        window.addEventListener('load', function() {
-            document.querySelectorAll('.card').forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(20px)';
-                    card.style.transition = 'all 0.6s ease';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, 100);
-                }, index * 100);
-            });
-        });
     </script>
 </body>
 </html>

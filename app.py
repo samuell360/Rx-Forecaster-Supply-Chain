@@ -3,7 +3,7 @@ RxForecaster Supply Chain Management System
 Main Flask Application with API Endpoints and Web Interface
 """
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, redirect, url_for
 from flask_cors import CORS
 from datetime import datetime
 import os
@@ -89,35 +89,8 @@ def create_app():
     # Root route
     @app.route('/')
     def index():
-        """Main dashboard page"""
-        return jsonify({
-            'message': 'Welcome to RxForecaster Supply Chain Management System',
-            'version': '1.0.0',
-            'features': [
-                'Drug inventory forecasting with FB Prophet and ARIMA',
-                'Anomaly detection for unusual demand patterns',
-                'Automated reorder recommendations',
-                'Real-time dashboard and analytics',
-                'RESTful API for integration'
-            ],
-            'api_endpoints': {
-                'health_check': '/api/v1/health',
-                'all_drugs': '/api/v1/drugs',
-                'drug_forecast': '/api/v1/forecast/<drug_name>',
-                'drug_anomalies': '/api/v1/anomalies/<drug_name>',
-                'reorder_report': '/api/v1/reorder_report',
-                'bulk_forecast': '/api/v1/bulk_forecast',
-                'bulk_anomalies': '/api/v1/bulk_anomalies',
-                'update_stock': '/api/v1/update_stock',
-                'departments': '/api/v1/departments',
-                'low_stock': '/api/v1/low_stock'
-            },
-            'documentation': {
-                'streamlit_dashboard': 'Run: streamlit run dashboard.py',
-                'api_testing': 'Use Postman or curl to test API endpoints',
-                'data_format': 'All dates in ISO format, stock levels as integers'
-            }
-        })
+        """Main dashboard page - redirect to beautiful dashboard"""
+        return redirect(url_for('dashboard'))
     
     @app.route('/docs')
     def api_documentation():
